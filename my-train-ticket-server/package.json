@@ -1,0 +1,18 @@
+{
+  "name": "my-train-ticket-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dayjs": "^1.8.28",
+    "koa": "^2.12.0",
+    "mocker-api": "^2.1.0"
+  }
+}
