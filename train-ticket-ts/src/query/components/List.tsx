@@ -1,9 +1,9 @@
 import React, { FC, memo, useMemo } from 'react'
 import URI from 'urijs'
 
-import { TrainProps, TrainItemProps } from './types'
+import { TrainProps, TrainItemProps } from '../types'
 
-import './styles/List.css'
+import '../styles/List.css'
 
 const ListItem: FC<TrainItemProps> = props => {
   const {

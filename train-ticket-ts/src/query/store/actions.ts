@@ -5,7 +5,7 @@ import {
   VisibleProp,
   OrderTypeProp,
   TrainProps,
-  TypeProps,
+  CheckedProps,
   TypesProps
 } from '../types'
 import { Dispatch } from 'redux'
@@ -124,7 +124,7 @@ export function setTicketTypes(tickets: TypesProps) {
   }
 }
 
-export function setCheckedTicketTypes(checked: TypeProps) {
+export function setCheckedTicketTypes(checked: CheckedProps) {
   return {
     type: ACTION_SET_CHECKED_TICKET_TYPES,
     payload: checked
@@ -138,7 +138,7 @@ export function setTrainTypes(types: TypesProps) {
   }
 }
 
-export function setCheckedTrainTypes(checked: TypeProps) {
+export function setCheckedTrainTypes(checked: CheckedProps) {
   return {
     type: ACTION_SET_CHECKED_TRAIN_TYPES,
     payload: checked
@@ -152,7 +152,7 @@ export function setDepartStations(stations: TypesProps) {
   }
 }
 
-export function setCheckedDepartStations(checked: TypeProps) {
+export function setCheckedDepartStations(checked: CheckedProps) {
   return {
     type: ACTION_SET_CHECKED_DEPART_STATIONS,
     payload: checked
@@ -166,7 +166,7 @@ export function setArriveStations(stations: TypesProps) {
   }
 }
 
-export function setCheckedArriveStations(checked: TypeProps) {
+export function setCheckedArriveStations(checked: CheckedProps) {
   return {
     type: ACTION_SET_CHECKED_ARRIVE_STATIONS,
     payload: checked

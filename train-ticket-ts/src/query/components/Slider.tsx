@@ -1,10 +1,18 @@
-import React, { memo, useState, useEffect, useMemo, useRef } from 'react'
-import PropTypes from 'prop-types'
+import React, { FC, memo, useState, useEffect, useRef, useMemo } from 'react'
 import leftPad from 'left-pad'
-import './Slider.css'
-import useWinSize from '../common/useWinSize'
 
-const Slider = memo(props => {
+import useWinSize from '../../common/useWinSize'
+import '../styles/Slider.css'
+
+interface SliderProps {
+  title: string
+  currentStartHours: number
+  currentEndHours: number
+  onStartChanged: React.Dispatch<React.SetStateAction<number>>
+  onEndChanged: React.Dispatch<React.SetStateAction<number>>
+}
+
+const Slider: FC<SliderProps> = memo(props => {
   const {
     title,
     currentStartHours,
@@ -14,14 +22,14 @@ const Slider = memo(props => {
   } = props
 
   const winSize = useWinSize()
-  const startHandle = useRef()
-  const endHandle = useRef()
+  const startHandler = useRef<HTMLElement>(null)
+  const endHandler = useRef<HTMLElement>(null)
 
-  const lastStartX = useRef()
-  const lastEndX = useRef()
+  const lastStartX = useRef<number>(0)
+  const lastEndX = useRef<number>(0)
 
-  const range = useRef()
-  const rangeWidth = useRef()
+  const range = useRef<HTMLDivElement>(null)
+  const rangeWidth = useRef<number>(0)
 
   const prevCurrentStartHours = useRef(currentStartHours)
   const prevCurrentEndHours = useRef(currentEndHours)
@@ -76,73 +84,77 @@ const Slider = memo(props => {
     return leftPad(endHours, 2, '0') + ':00'
   }, [endHours])
 
-  function onStartTouchBegin(e) {
+  function onStartTouchBegin(e: TouchEvent) {
     const touch = e.targetTouches[0]
     lastStartX.current = touch.pageX
   }
 
-  function onEndTouchBegin(e) {
+  function onEndTouchBegin(e: TouchEvent) {
     const touch = e.targetTouches[0]
     lastEndX.current = touch.pageX
   }
 
-  function onStartTouchMove(e) {
+  function onStartTouchMove(e: TouchEvent) {
     const touch = e.targetTouches[0]
     const distance = touch.pageX - lastStartX.current
     lastStartX.current = touch.pageX
+
     setStart(start => start + (distance / rangeWidth.current) * 100)
   }
 
-  function onEndTouchMove(e) {
+  function onEndTouchMove(e: TouchEvent) {
     const touch = e.targetTouches[0]
     const distance = touch.pageX - lastEndX.current
     lastEndX.current = touch.pageX
 
-    setEnd(end => end + (distance / rangeWidth.current) * 100)
+    setEnd(start => start + (distance / rangeWidth.current) * 100)
   }
 
   useEffect(() => {
+    if (!range.current) return
     rangeWidth.current = parseFloat(
       window.getComputedStyle(range.current).width
     )
   }, [winSize.width])
 
   useEffect(() => {
-    startHandle.current.addEventListener('touchstart', onStartTouchBegin, false)
-    startHandle.current.addEventListener('touchmove', onStartTouchMove, false)
+    if (!startHandler.current || !endHandler.current) return
+    const startHandlerCurrent = startHandler.current
+    const endHandlerCurrent = endHandler.current
+    startHandlerCurrent.addEventListener('touchstart', onStartTouchBegin, false)
+    startHandlerCurrent.addEventListener('touchmove', onStartTouchMove, false)
 
-    endHandle.current.addEventListener('touchstart', onEndTouchBegin, false)
-    endHandle.current.addEventListener('touchmove', onEndTouchMove, false)
+    endHandlerCurrent.addEventListener('touchstart', onEndTouchBegin, false)
+    endHandlerCurrent.addEventListener('touchmove', onEndTouchMove, false)
 
     return () => {
-      startHandle.current.removeEventListener(
+      startHandlerCurrent.removeEventListener(
         'touchstart',
         onStartTouchBegin,
         false
       )
-      startHandle.current.removeEventListener(
+      startHandlerCurrent.removeEventListener(
         'touchmove',
         onStartTouchMove,
         false
       )
 
-      endHandle.current.removeEventListener(
+      endHandlerCurrent.removeEventListener(
         'touchstart',
         onEndTouchBegin,
         false
       )
-      endHandle.current.removeEventListener('touchmove', onEndTouchMove, false)
+      endHandlerCurrent.removeEventListener('touchmove', onEndTouchMove, false)
     }
   })
 
   useEffect(() => {
-    console.log(startHours)
     onStartChanged(startHours)
-  }, [startHours])
+  }, [onStartChanged, startHours])
 
   useEffect(() => {
     onEndChanged(endHours)
-  }, [endHours])
+  }, [onEndChanged, endHours])
 
   return (
     <div className="option">
@@ -157,14 +169,14 @@ const Slider = memo(props => {
             }}
           ></div>
           <i
-            ref={startHandle}
+            ref={startHandler}
             className="slider-handle"
             style={{ left: startPercent + '%' }}
           >
             <span>{startText}</span>
           </i>
           <i
-            ref={endHandle}
+            ref={endHandler}
             className="slider-handle"
             style={{ left: endPercent + '%' }}
           >
@@ -175,13 +187,5 @@ const Slider = memo(props => {
     </div>
   )
 })
-
-Slider.propTypes = {
-  title: PropTypes.string.isRequired,
-  currentStartHours: PropTypes.number.isRequired,
-  currentEndHours: PropTypes.number.isRequired,
-  onStartChanged: PropTypes.func.isRequired,
-  onEndChanged: PropTypes.func.isRequired
-}
 
 export default Slider

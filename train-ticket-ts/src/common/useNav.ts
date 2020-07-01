@@ -16,12 +16,12 @@ export default function useNav(
   const prev = useCallback(() => {
     if (isPrevDisabled) return
     dispatch(prevDate())
-  }, [isPrevDisabled])
+  }, [dispatch, prevDate, isPrevDisabled])
 
   const next = useCallback(() => {
     if (isNextDisabled) return
     dispatch(nextDate())
-  }, [isNextDisabled])
+  }, [dispatch, nextDate, isNextDisabled])
 
   return {
     isPrevDisabled,

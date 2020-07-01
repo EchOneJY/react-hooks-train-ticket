@@ -6,8 +6,8 @@ import {
   VisibleProp,
   OrderTypeProp,
   TrainProps,
-  TypeProps,
-  TypesProps
+  TypesProps,
+  CheckedProps
 } from '../types'
 import {
   ACTION_SET_FROM,
@@ -113,8 +113,8 @@ export default {
   },
 
   checkedTicketTypes(
-    state: TypeProps = { name: '', value: '' },
-    actions: ActionProps<TypeProps>
+    state: CheckedProps = {},
+    actions: ActionProps<CheckedProps>
   ) {
     const { type, payload } = actions
     switch (type) {
@@ -146,8 +146,8 @@ export default {
   },
 
   checkedTrainTypes(
-    state: TypeProps = { name: '', value: '' },
-    actions: ActionProps<TypeProps>
+    state: CheckedProps = {},
+    actions: ActionProps<CheckedProps>
   ) {
     const { type, payload } = actions
     switch (type) {
@@ -169,8 +169,8 @@ export default {
   },
 
   checkedDepartStations(
-    state: TypeProps = { name: '', value: '' },
-    actions: ActionProps<TypeProps>
+    state: CheckedProps = {},
+    actions: ActionProps<CheckedProps>
   ) {
     const { type, payload } = actions
     switch (type) {
@@ -192,8 +192,8 @@ export default {
   },
 
   checkedArriveStations(
-    state: TypeProps = { name: '', value: '' },
-    actions: ActionProps<TypeProps>
+    state: CheckedProps = {},
+    actions: ActionProps<CheckedProps>
   ) {
     const { type, payload } = actions
     switch (type) {

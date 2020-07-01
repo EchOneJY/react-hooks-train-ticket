@@ -3,11 +3,6 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import reducers from './reducers'
 import thunk from 'redux-thunk'
 
-const defaultTypeValue = {
-  name: '',
-  value: ''
-}
-
 export default createStore(
   combineReducers(reducers),
   {
@@ -19,13 +14,13 @@ export default createStore(
     onlyTickets: false,
     orderType: 'depart',
     ticketTypes: null,
-    checkedTicketTypes: defaultTypeValue,
+    checkedTicketTypes: {},
     trainTypes: null,
-    checkedTrainTypes: defaultTypeValue,
+    checkedTrainTypes: {},
     departStations: null,
-    checkedDepartStations: defaultTypeValue,
+    checkedDepartStations: {},
     arriveStations: null,
-    checkedArriveStations: defaultTypeValue,
+    checkedArriveStations: {},
     departTimeStart: 0,
     departTimeEnd: 24,
     arriveTimeStart: 0,

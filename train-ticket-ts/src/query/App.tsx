@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useCallback } from 'react'
+import React, { FC, useEffect, useMemo, useCallback } from 'react'
 import { Dispatch, bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import URI from 'urijs'
@@ -10,14 +10,17 @@ import {
   VisibleProp,
   DepartDateProp,
   TrainProps,
+  CheckedProps,
   TypesProps,
-  FetchTrainProp
+  DispatchMiddleParamProp,
+  OrderTypeProp
 } from './types'
 
 import Header from '../common/Header'
 import Nav from '../common/Nav'
 import useNav from '../common/useNav'
-import List from './List'
+import List from './components/List'
+import Bottom from './components/Bottom'
 
 import './styles/App.css'
 import dayjs from 'dayjs'
@@ -30,7 +33,19 @@ import {
   setDepartDate,
   setHighSpeed,
   fetchTrainInfo,
-  setSearchParsed
+  setSearchParsed,
+  toggleOrderType,
+  toggleHighSpeed,
+  toggleOnlyTickets,
+  toggleIsFiltersVisible,
+  setCheckedTicketTypes,
+  setCheckedTrainTypes,
+  setCheckedDepartStations,
+  setCheckedArriveStations,
+  setDepartTimeStart,
+  setDepartTimeEnd,
+  setArriveTimeStart,
+  setArriveTimeEnd
 } from './store/actions'
 import { timeZero } from '../common/utils'
 
@@ -48,11 +63,22 @@ interface AppProps {
   departDate: DepartDateProp
   searchParsed: VisibleProp
   trainList: TrainProps
-  trainType: TypesProps
-  ticketType: TypesProps
+  orderType: OrderTypeProp
+  onlyTickets: VisibleProp
+  trainTypes: TypesProps
+  ticketTypes: TypesProps
   departStations: TypesProps
   arriveStations: TypesProps
-  fetchTrain: FetchTrainProp
+  isFiltersVisible: VisibleProp
+  checkedTicketTypes: CheckedProps
+  checkedTrainTypes: CheckedProps
+  checkedDepartStations: CheckedProps
+  checkedArriveStations: CheckedProps
+  departTimeStart: number
+  departTimeEnd: number
+  arriveTimeStart: number
+  arriveTimeEnd: number
+  fetchTrain: DispatchMiddleParamProp<string>
   dispatch: Dispatch
 }
 
@@ -63,11 +89,22 @@ const App: FC<AppProps> = props => {
     departDate,
     highSpeed,
     trainList,
-    trainType,
-    ticketType,
+    orderType,
+    onlyTickets,
+    trainTypes,
+    ticketTypes,
     departStations,
     arriveStations,
     searchParsed,
+    isFiltersVisible,
+    checkedTicketTypes,
+    checkedTrainTypes,
+    checkedDepartStations,
+    checkedArriveStations,
+    departTimeStart,
+    departTimeEnd,
+    arriveTimeStart,
+    arriveTimeEnd,
     fetchTrain,
     dispatch
   } = props
@@ -92,7 +129,7 @@ const App: FC<AppProps> = props => {
     dispatch(setHighSpeed(highSpeed === true))
 
     dispatch(setSearchParsed(true))
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if (!searchParsed) {
@@ -102,11 +139,36 @@ const App: FC<AppProps> = props => {
       .setSearch('from', from || '')
       .setSearch('to', to || '')
       .setSearch('date', dayjs(departDate).format('YYYY-MM-DD') || '')
-      .setSearch('highSpeed', highSpeed + '' || 'false')
+      .setSearch('orderType', orderType)
+      .setSearch('highSpeed', highSpeed + '')
+      .setSearch('onlyTickets', onlyTickets + '')
+      .setSearch('checkedTicketTypes', Object.keys(checkedTicketTypes).join())
+      .setSearch('checkedTrainTypes', Object.keys(checkedTrainTypes).join())
+      .setSearch(
+        'checkedDepartStations',
+        Object.keys(checkedDepartStations).join()
+      )
+      .setSearch(
+        'checkedArriveStations',
+        Object.keys(checkedArriveStations).join()
+      )
       .toString()
 
     fetchTrain(url)
-  }, [from, to, departDate, highSpeed])
+  }, [
+    from,
+    to,
+    departDate,
+    orderType,
+    highSpeed,
+    searchParsed,
+    onlyTickets,
+    checkedTicketTypes,
+    checkedTrainTypes,
+    checkedDepartStations,
+    checkedArriveStations,
+    fetchTrain
+  ])
 
   const onBack = useCallback(() => {
     window.history.back()
@@ -118,6 +180,26 @@ const App: FC<AppProps> = props => {
     prevDate,
     nextDate
   )
+
+  const bottomCbs = useMemo(() => {
+    return bindActionCreators(
+      {
+        toggleOrderType,
+        toggleHighSpeed,
+        toggleOnlyTickets,
+        toggleIsFiltersVisible,
+        setCheckedTicketTypes,
+        setCheckedTrainTypes,
+        setCheckedDepartStations,
+        setCheckedArriveStations,
+        setDepartTimeStart,
+        setDepartTimeEnd,
+        setArriveTimeStart,
+        setArriveTimeEnd
+      },
+      dispatch
+    )
+  }, [dispatch])
 
   if (!searchParsed) {
     return null
@@ -136,6 +218,25 @@ const App: FC<AppProps> = props => {
         isNextDisabled={isNextDisabled}
       />
       <List list={trainList} />
+      <Bottom
+        highSpeed={highSpeed}
+        orderType={orderType}
+        onlyTickets={onlyTickets}
+        isFiltersVisible={isFiltersVisible}
+        ticketTypes={ticketTypes}
+        trainTypes={trainTypes}
+        departStations={departStations}
+        arriveStations={arriveStations}
+        checkedTicketTypes={checkedTicketTypes}
+        checkedTrainTypes={checkedTrainTypes}
+        checkedDepartStations={checkedDepartStations}
+        checkedArriveStations={checkedArriveStations}
+        departTimeStart={departTimeStart}
+        departTimeEnd={departTimeEnd}
+        arriveTimeStart={arriveTimeStart}
+        arriveTimeEnd={arriveTimeEnd}
+        {...bottomCbs}
+      />
     </div>
   )
 }
@@ -147,10 +248,21 @@ const mapStateToProps = ({
   highSpeed,
   searchParsed,
   trainList,
-  trainType,
-  ticketType,
+  orderType,
+  onlyTickets,
+  trainTypes,
+  ticketTypes,
   departStations,
-  arriveStations
+  arriveStations,
+  isFiltersVisible,
+  checkedTicketTypes,
+  checkedTrainTypes,
+  checkedDepartStations,
+  checkedArriveStations,
+  departTimeStart,
+  departTimeEnd,
+  arriveTimeStart,
+  arriveTimeEnd
 }: StoreState) => {
   return {
     to,
@@ -159,10 +271,21 @@ const mapStateToProps = ({
     highSpeed,
     searchParsed,
     trainList,
-    trainType,
-    ticketType,
+    orderType,
+    onlyTickets,
+    trainTypes,
+    ticketTypes,
     departStations,
-    arriveStations
+    arriveStations,
+    isFiltersVisible,
+    checkedTicketTypes,
+    checkedTrainTypes,
+    checkedDepartStations,
+    checkedArriveStations,
+    departTimeStart,
+    departTimeEnd,
+    arriveTimeStart,
+    arriveTimeEnd
   }
 }
 

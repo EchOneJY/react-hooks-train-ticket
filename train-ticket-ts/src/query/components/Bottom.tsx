@@ -1,22 +1,34 @@
-import React, { useState, useCallback, useMemo, useReducer, memo } from 'react'
-import PropTypes from 'prop-types'
+import React, { FC, memo, useState, useMemo, useReducer } from 'react'
 import classNames from 'classnames'
-import './Bottom.css'
-import Slider from './Slider'
-import { ORDER_DEPART } from './constant'
 
-function checkedReducer(state, action) {
+import '../styles/Bottom.css'
+import Slider from './Slider'
+
+import {
+  VisibleProp,
+  OrderTypeProp,
+  TimeProp,
+  CheckedProps,
+  TypesProps,
+  DispatchMiddleProp,
+  ActionParamProp,
+  ActionProps
+} from '../types'
+
+function checkedReducer(state: CheckedProps, action: ActionProps<string>) {
   const { type, payload } = action
-  let newState
   switch (type) {
     case 'toggle':
-      console.log(state)
+      let newState = { ...state }
       newState = { ...state }
-      if (payload in newState) {
-        delete newState[payload]
-      } else {
-        newState[payload] = true
+      if (payload) {
+        if (payload in newState) {
+          delete newState[payload]
+        } else {
+          newState[payload] = true
+        }
       }
+      console.log(newState)
       return newState
     case 'reset':
       return {}
@@ -25,7 +37,14 @@ function checkedReducer(state, action) {
   return state
 }
 
-const Filter = memo(props => {
+interface FilterProps {
+  name?: string
+  checked: boolean
+  value?: string
+  dispatch: (value: ActionProps<string>) => void
+}
+
+const Filter: FC<FilterProps> = props => {
   const { name, checked, value, dispatch } = props
   return (
     <li
@@ -35,59 +54,62 @@ const Filter = memo(props => {
       {name}
     </li>
   )
-})
-
-Filter.propTypes = {
-  name: PropTypes.string.isRequired,
-  checked: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
-  dispatch: PropTypes.func.isRequired
 }
 
-const Option = memo(props => {
+interface OptionProps {
+  title: string
+  options: TypesProps
+  checkedMap: CheckedProps
+  dispatch: (value: ActionProps<string>) => void
+}
+
+const Option: FC<OptionProps> = props => {
   const { title, options, checkedMap, dispatch } = props
-
-  // const toggle = useCallback(
-  //   value => {
-  //     let newCheckedMap = { ...checkedMap }
-
-  //     if (value in checkedMap) {
-  //       delete newCheckedMap[value]
-  //     } else {
-  //       newCheckedMap[value] = true
-  //     }
-
-  //     dispatch(newCheckedMap)
-  //   },
-  //   [checkedMap, dispatch]
-  // )
-
   return (
     <div className="option">
       <h3>{title}</h3>
       <ul>
-        {options.map(option => {
-          return (
-            <Filter
-              key={option.value}
-              {...option}
-              checked={option.value in checkedMap}
-              dispatch={dispatch}
-            />
-          )
-        })}
+        {options &&
+          options.map(option => {
+            return (
+              <Filter
+                key={option.value}
+                {...option}
+                checked={checkedMap.hasOwnProperty(option.value)}
+                dispatch={dispatch}
+              />
+            )
+          })}
       </ul>
     </div>
   )
-})
-Option.propTypes = {
-  title: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
-  checkedMap: PropTypes.object.isRequired,
-  dispatch: PropTypes.func.isRequired
 }
 
-const BottomModal = memo(props => {
+interface BottomModalProps {
+  toggleIsFiltersVisible: DispatchMiddleProp
+  ticketTypes: TypesProps
+  trainTypes: TypesProps
+  departStations: TypesProps
+  arriveStations: TypesProps
+  checkedTicketTypes: CheckedProps
+  checkedTrainTypes: CheckedProps
+  checkedDepartStations: CheckedProps
+  checkedArriveStations: CheckedProps
+  departTimeStart: TimeProp
+  departTimeEnd: TimeProp
+  arriveTimeStart: TimeProp
+  arriveTimeEnd: TimeProp
+  setCheckedTicketTypes: ActionParamProp<CheckedProps>
+  setCheckedTrainTypes: ActionParamProp<CheckedProps>
+  setCheckedDepartStations: ActionParamProp<CheckedProps>
+  setCheckedArriveStations: ActionParamProp<CheckedProps>
+  setDepartTimeStart: ActionParamProp<TimeProp>
+  setDepartTimeEnd: ActionParamProp<TimeProp>
+  setArriveTimeStart: ActionParamProp<TimeProp>
+  setArriveTimeEnd: ActionParamProp<TimeProp>
+}
+
+const BottomModal: FC<BottomModalProps> = props => {
   const {
     ticketTypes,
     trainTypes,
@@ -115,7 +137,7 @@ const BottomModal = memo(props => {
   const [localCheckedTicketTypes, localCheckedTicketTypesDispatch] = useReducer(
     checkedReducer,
     checkedTicketTypes,
-    checkedTicketTypes => {
+    () => {
       return {
         ...checkedTicketTypes
       }
@@ -125,7 +147,7 @@ const BottomModal = memo(props => {
   const [localCheckedTrainTypes, localCheckedTrainTypesDispatch] = useReducer(
     checkedReducer,
     checkedTrainTypes,
-    checkedTrainTypes => {
+    () => {
       return {
         ...checkedTrainTypes
       }
@@ -135,29 +157,20 @@ const BottomModal = memo(props => {
   const [
     localCheckedDepartStations,
     localCheckedDepartStationsDispatch
-  ] = useReducer(
-    checkedReducer,
-    checkedDepartStations,
-    checkedDepartStations => {
-      return {
-        ...checkedDepartStations
-      }
+  ] = useReducer(checkedReducer, checkedDepartStations, () => {
+    return {
+      ...checkedDepartStations
     }
-  )
+  })
 
   const [
     localCheckedArriveStations,
     localCheckedArriveStationsDispatch
-  ] = useReducer(
-    checkedReducer,
-    checkedArriveStations,
-    checkedArriveStations => {
-      return {
-        ...checkedArriveStations
-      }
+  ] = useReducer(checkedReducer, checkedArriveStations, () => {
+    return {
+      ...checkedArriveStations
     }
-  )
-
+  })
   const [localDepartTimeStart, setLocalDepartTimeStart] = useState(
     departTimeStart
   )
@@ -204,7 +217,7 @@ const BottomModal = memo(props => {
     setDepartTimeEnd(localDepartTimeEnd)
 
     setArriveTimeStart(localArriveTimeStart)
-    setArriveTimeEnd(localArriveTimeStart)
+    setArriveTimeEnd(localArriveTimeEnd)
 
     toggleIsFiltersVisible()
   }
@@ -243,6 +256,7 @@ const BottomModal = memo(props => {
     setLocalArriveTimeStart(0)
     setLocalArriveTimeEnd(24)
   }
+
   return (
     <div className="bottom-modal">
       <div className="bottom-dialog">
@@ -281,33 +295,18 @@ const BottomModal = memo(props => {
       </div>
     </div>
   )
-})
-
-BottomModal.propTypes = {
-  ticketTypes: PropTypes.array.isRequired,
-  trainTypes: PropTypes.array.isRequired,
-  departStations: PropTypes.array.isRequired,
-  arriveStations: PropTypes.array.isRequired,
-  checkedTicketTypes: PropTypes.object.isRequired,
-  checkedTrainTypes: PropTypes.object.isRequired,
-  checkedDepartStations: PropTypes.object.isRequired,
-  checkedArriveStations: PropTypes.object.isRequired,
-  departTimeStart: PropTypes.number.isRequired,
-  departTimeEnd: PropTypes.number.isRequired,
-  arriveTimeStart: PropTypes.number.isRequired,
-  arriveTimeEnd: PropTypes.number.isRequired,
-  setCheckedTicketTypes: PropTypes.func.isRequired,
-  setCheckedTrainTypes: PropTypes.func.isRequired,
-  setCheckedDepartStations: PropTypes.func.isRequired,
-  setCheckedArriveStations: PropTypes.func.isRequired,
-  setDepartTimeStart: PropTypes.func.isRequired,
-  setDepartTimeEnd: PropTypes.func.isRequired,
-  setArriveTimeStart: PropTypes.func.isRequired,
-  setArriveTimeEnd: PropTypes.func.isRequired,
-  toggleIsFiltersVisible: PropTypes.func.isRequired
 }
 
-export default function Bottom(props) {
+interface BottomProps extends BottomModalProps {
+  toggleOrderType: DispatchMiddleProp
+  toggleHighSpeed: DispatchMiddleProp
+  toggleOnlyTickets: DispatchMiddleProp
+  highSpeed: VisibleProp
+  orderType: OrderTypeProp
+  onlyTickets: VisibleProp
+  isFiltersVisible: VisibleProp
+}
+const Bottom: FC<BottomProps> = memo(props => {
   const {
     toggleOrderType,
     toggleHighSpeed,
@@ -362,13 +361,12 @@ export default function Bottom(props) {
     arriveTimeStart,
     arriveTimeEnd
   ])
-
   return (
     <div className="bottom">
       <div className="bottom-filters">
         <span className="item" onClick={toggleOrderType}>
           <i className="icon">&#xf065;</i>
-          {orderType === ORDER_DEPART ? '出发 早→晚' : '耗时 短→长'}
+          {orderType === 'depart' ? '出发 早→晚' : '耗时 短→长'}
         </span>
         <span
           className={classNames('item', { 'item-on': highSpeed })}
@@ -421,36 +419,6 @@ export default function Bottom(props) {
       )}
     </div>
   )
-}
+})
 
-Bottom.propTypes = {
-  toggleOrderType: PropTypes.func.isRequired,
-  toggleOrderType: PropTypes.func.isRequired,
-  toggleOnlyTickets: PropTypes.func.isRequired,
-  toggleIsFiltersVisible: PropTypes.func.isRequired,
-  highSpeed: PropTypes.bool.isRequired,
-  orderType: PropTypes.number.isRequired,
-  onlyTickets: PropTypes.bool.isRequired,
-  isFiltersVisible: PropTypes.bool.isRequired,
-  ticketTypes: PropTypes.array.isRequired,
-  trainTypes: PropTypes.array.isRequired,
-  departStations: PropTypes.array.isRequired,
-  arriveStations: PropTypes.array.isRequired,
-  checkedTicketTypes: PropTypes.object.isRequired,
-  checkedTrainTypes: PropTypes.object.isRequired,
-  checkedDepartStations: PropTypes.object.isRequired,
-  checkedArriveStations: PropTypes.object.isRequired,
-  departTimeStart: PropTypes.number.isRequired,
-  departTimeEnd: PropTypes.number.isRequired,
-  arriveTimeStart: PropTypes.number.isRequired,
-  arriveTimeEnd: PropTypes.number.isRequired,
-
-  setCheckedTicketTypes: PropTypes.func.isRequired,
-  setCheckedTrainTypes: PropTypes.func.isRequired,
-  setCheckedDepartStations: PropTypes.func.isRequired,
-  setCheckedArriveStations: PropTypes.func.isRequired,
-  setDepartTimeStart: PropTypes.func.isRequired,
-  setDepartTimeEnd: PropTypes.func.isRequired,
-  setArriveTimeStart: PropTypes.func.isRequired,
-  setArriveTimeEnd: PropTypes.func.isRequired
-}
+export default Bottom

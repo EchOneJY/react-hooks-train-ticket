@@ -121,7 +121,7 @@ const App: FC<AppProps> = props => {
   return (
     <div>
       <div className="header-wrapper">
-        <Header title="1" onBack={onBack} />
+        <Header title="火车票" onBack={onBack} />
       </div>
       <form action="query.html" className="form">
         <Journey to={to} from={from} {...journeyCbs} />
