@@ -47,7 +47,7 @@ const Detail: FC<DetailProps> = memo(props => {
         <div className="left">
           <p className="city">{departStation}</p>
           <p className="time">{departTimeStr}</p>
-          <p className="datee">{departDateStr}</p>
+          <p className="date">{departDateStr}</p>
         </div>
         <div className="middle">
           <p className="train-name">{trainNumber}</p>
