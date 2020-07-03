@@ -121,7 +121,7 @@ export function fetchCityData() {
 
     dispatch(setIsLoadingCityData(true))
 
-    fetch('/rest/cities?_' + Date.now())
+    fetch('http://easy-mock.liuup.com/mock/5efef790339f163501d502b7/api/cities')
       .then(res => res.json())
       .then(data => {
         dispatch(setCityData(data.cityList))

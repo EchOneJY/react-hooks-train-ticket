@@ -104,7 +104,7 @@ const App: FC<AppProps> = props => {
     dispatch(setDepartDate(timeZero(dayjs(date).valueOf())))
 
     dispatch(setSearchParsed(true))
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     document.title = trainNumber + ''
@@ -113,13 +113,15 @@ const App: FC<AppProps> = props => {
   useEffect(() => {
     if (!searchParsed) return
 
-    const url = new URI('/rest/ticket')
+    const url = new URI(
+      'http://easy-mock.liuup.com/mock/5efef790339f163501d502b7/api/ticket/detail'
+    )
       .setSearch('date', dayjs(departDate).format('YYYY-MM-DD'))
       .setSearch('trainNumber', trainNumber + '')
       .toString()
 
     fetchInfo(url)
-  }, [searchParsed, departDate, trainNumber])
+  }, [searchParsed, departDate, trainNumber, dispatch, fetchInfo])
 
   const { isPrevDisabled, isNextDisabled, prev, next } = useNav(
     departDate,

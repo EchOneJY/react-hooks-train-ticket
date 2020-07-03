@@ -131,13 +131,15 @@ const App: FC<AppProps> = props => {
   useEffect(() => {
     if (!searchParsed) return
 
-    const url = new URI('/rest/order')
+    const url = new URI(
+      'http://easy-mock.liuup.com/mock/5efef790339f163501d502b7/api/order'
+    )
       .setSearch('trainNumber', trainNumber + '')
       .setSearch('date', dayjs(departDate).format('YYYY-MM-DD'))
       .toString()
 
     fetchInfo(url)
-  }, [trainNumber, departDate])
+  }, [searchParsed, trainNumber, departDate, fetchInfo])
 
   const passengerCbs = useMemo(() => {
     return bindActionCreators(
@@ -152,7 +154,7 @@ const App: FC<AppProps> = props => {
       },
       dispatch
     )
-  }, [])
+  }, [dispatch])
 
   const menuCbs = useMemo(() => {
     return bindActionCreators(
@@ -161,7 +163,7 @@ const App: FC<AppProps> = props => {
       },
       dispatch
     )
-  }, [])
+  }, [dispatch])
 
   const currentMenu = useMemo(() => {
     if (menu && Object.keys(menu).length) {

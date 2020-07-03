@@ -135,7 +135,9 @@ const App: FC<AppProps> = props => {
     if (!searchParsed) {
       return
     }
-    const url = new URI('/rest/query')
+    const url = new URI(
+      'http://easy-mock.liuup.com/mock/5efef790339f163501d502b7/api/train/list'
+    )
       .setSearch('from', from || '')
       .setSearch('to', to || '')
       .setSearch('date', dayjs(departDate).format('YYYY-MM-DD') || '')

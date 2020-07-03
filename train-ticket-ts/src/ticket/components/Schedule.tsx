@@ -90,7 +90,9 @@ const Schedule: FC<ScheduleProps> = memo(props => {
   const [scheduleList, setScheduleList] = useState<SchduleItem[]>([])
 
   useEffect(() => {
-    const url = new URI('/rest/schedule')
+    const url = new URI(
+      'http://easy-mock.liuup.com/mock/5efef790339f163501d502b7/api/schedule'
+    )
       .setSearch('trainNumber', trainNumber + '')
       .setSearch('departStation', departStation || '')
       .setSearch('arriveStation', arriveStation || '')

@@ -1,7 +1,6 @@
-import { Dispatch, bindActionCreators } from 'redux'
+import { Dispatch } from 'redux'
 
 import {
-  ActionProps,
   TrainNumberProp,
   StationProp,
   DateProp,
