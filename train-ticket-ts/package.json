@@ -2,6 +2,7 @@
   "name": "my-train-ticket-ts",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://EchOneJY.github.io/react-hooks-train-ticket",
   "dependencies": {
     "@babel/core": "7.9.0",
     "@svgr/webpack": "4.3.3",
