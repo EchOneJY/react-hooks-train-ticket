@@ -13,6 +13,6 @@
   "dependencies": {
     "dayjs": "^1.8.28",
     "koa": "^2.12.0",
-    "mocker-api": "^2.1.0"
+    "mocker-api": "^2.9.5"
   }
 }
